@@ -12,11 +12,28 @@ namespace BlogProject.Controllers
         // GET: Home
 
         private BlogContext db = new BlogContext();
+
+       
         public ActionResult Index()
         {
+            var bloglar = db.Bloglar
+                            .Where(i => i.Onay == true && i.Anasayfa == true)
+                            .Select(i => new BlogModel()
+                            {
+                                Id = i.Id,
+                                Baslik = i.Baslik.Length > 100 ? i.Baslik.Substring(0, 100) + "..." : i.Baslik,
+                                Aciklama = i.Aciklama,
+                                EklenmeTarihi = i.EklenmeTarihi,
+                                Anasayfa = i.Anasayfa,
+                                Onay = i.Onay,
+                                Resim = i.Resim
+
+
+
+                            });
              
              
-            return View(db.Bloglar.ToList());
+            return View(bloglar.ToList());
         }
     }
 }

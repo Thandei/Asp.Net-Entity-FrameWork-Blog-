@@ -14,10 +14,41 @@ namespace BlogProject.Controllers
     {
         private BlogContext db = new BlogContext();
 
+
+        public ActionResult List(int? id, string q)
+        {
+            var bloglar = db.Bloglar
+                             .Where(i => i.Onay == true)
+                             .Select(i => new BlogModel()
+                             {
+                                 Id = i.Id,
+                                 Baslik = i.Baslik.Length > 100 ? i.Baslik.Substring(0, 100) + "..." : i.Baslik,
+                                 Aciklama = i.Aciklama,
+                                 EklenmeTarihi = i.EklenmeTarihi,
+                                 Anasayfa = i.Anasayfa,
+                                 Onay = i.Onay,
+                                 Resim = i.Resim,
+                                 CategoryId = i.CategoryId
+                             }).AsQueryable();
+
+            if (string.IsNullOrEmpty("q") == false)
+            {
+                bloglar = bloglar.Where(i => i.Baslik.Contains(q) || i.Aciklama.Contains(q));
+            }
+
+            if (id != null)
+            {
+                bloglar = bloglar.Where(i => i.CategoryId == id);
+            }
+
+            return View(bloglar.ToList());
+        }
+
         // GET: Blog
         public ActionResult Index()
         {
-            var bloglar = db.Bloglar.Include(b => b.Category);
+
+            var bloglar = db.Bloglar.Include(b => b.Category).OrderByDescending(i => i.EklenmeTarihi);
             return View(bloglar.ToList());
         }
 
@@ -48,10 +79,11 @@ namespace BlogProject.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Aciklama,Resim,Baslik,Icerik,EklenmeTarihi,Onay,Anasayfa,CategoryId")] Blog blog)
+        public ActionResult Create([Bind(Include = "Id,Aciklama,Resim,Baslik,Iceri,CategoryId")] Blog blog)
         {
             if (ModelState.IsValid)
             {
+                blog.EklenmeTarihi = DateTime.Now;
                 db.Bloglar.Add(blog);
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -82,13 +114,27 @@ namespace BlogProject.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Aciklama,Resim,Baslik,Icerik,EklenmeTarihi,Onay,Anasayfa,CategoryId")] Blog blog)
+        public ActionResult Edit([Bind(Include = "Id,Aciklama,Resim,Baslik,Icerik, Onay,Anasayfa,CategoryId")] Blog blog)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(blog).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var entity = db.Bloglar.Find(blog.Id);
+                if (entity != null)
+                {
+                    entity.Onay = blog.Onay;
+                    entity.Resim = blog.Resim;
+                    entity.CategoryId = blog.CategoryId;
+                    entity.Aciklama = blog.Aciklama;
+                    entity.Baslik = blog.Baslik;
+                    entity.Anasayfa = blog.Anasayfa;
+                    entity.Icerik = blog.Icerik;
+                    entity.EklenmeTarihi = DateTime.Now;
+
+                    db.SaveChanges();
+                    TempData["Blog"] = blog;
+                    return RedirectToAction("Index");
+                }
+                
             }
             ViewBag.CategoryId = new SelectList(db.Kategoriler, "Id", "KategoriAdi", blog.CategoryId);
             return View(blog);

@@ -1,0 +1,20 @@
+﻿
+@using (Html.BeginForm("List","Blog",FormMethod.Get))
+{ 
+<div class="card">
+    <hr />
+    <div class="card bg-light p-3">
+        <h5>Blog Arama </h5>
+        <form role="form">
+            <div class="form-group">
+                @Html.TextBox("q", null, new { @class = "form-control" })
+            </div>
+            <button type="submit" class="btn btn-primary">Ara</button>
+        </form>
+    </div>
+    <hr />
+
+</div>
+
+}
+

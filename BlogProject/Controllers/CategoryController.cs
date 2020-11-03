@@ -15,6 +15,11 @@ namespace BlogProject.Controllers
         private BlogContext db = new BlogContext();
 
         // GET: Category
+        public PartialViewResult KategoriListesi()
+        {
+            return PartialView(db.Kategoriler.ToList());
+        }
+
         public ActionResult Index()
         {
             BlogContext db = new BlogContext();
@@ -94,6 +99,7 @@ namespace BlogProject.Controllers
             {
                 db.Entry(category).State = EntityState.Modified;
                 db.SaveChanges();
+                TempData["Kategori"] = category;
                 return RedirectToAction("Index");
             }
             return View(category);

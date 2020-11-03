@@ -1,10 +1,14 @@
-﻿@model List<BlogProject.Models.Blog>
+﻿@model List<BlogProject.Models.BlogModel>
 
 
+<h2>Blog Listesi</h2>
+<hr />
+@Html.Partial("BlogList", Model)
+<div class="row">
+@section SagKolon
+{
+    @Html.Partial("Search")
+    @{Html.RenderAction("KategoriListesi", "Category"); }
+}
 
-<div>
-    @foreach (var i in Model)
-    {
-    <p>@i.Baslik</p>
-    }
 </div>

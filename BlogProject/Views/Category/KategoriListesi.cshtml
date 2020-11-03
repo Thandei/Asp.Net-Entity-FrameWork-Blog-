@@ -1,0 +1,22 @@
+﻿@model IEnumerable<BlogProject.Models.category>
+
+
+<div class="card">
+    <h4>Blog Kategorileri</h4>
+    <hr />
+    
+
+        @foreach (var item in Model)
+        {
+            <div class="col-lg-6">
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="/Blog/List/@item.Id">@item.KategoriAdi</a>
+                    </li>
+                </ul>
+            </div>
+        }
+
+</div>
+     
+ 
